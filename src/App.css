@@ -1,0 +1,16 @@
+.app {
+  overflow-y: none;
+}
+
+.shadow {
+  position: absolute;
+  background-color: gray;
+  overflow-y: hidden;
+  image-rendering:optimizeQuality;
+  z-index: 1;
+}
+
+button {
+  position: fixed;
+  z-index: 2;
+}
