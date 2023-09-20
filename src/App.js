@@ -1,5 +1,6 @@
 import './App.css';
 import * as Astronomy from 'astronomy-engine'
+import * as OverpassFrontend from 'overpass-frontend'
 import { useRef } from 'react';
 
 export const App = () => {
@@ -16,9 +17,9 @@ export const App = () => {
 
   const latitude = 32.79801
   const longitude = -96.83573
-  const building_height = 230 //in
+  const building_height = 186 //in
   const building_length = 1920 //in
-  const building_sun_angle = 210.67 //degrees
+  const building_sun_angle = 208.56 //degrees
   const scale = {x:5, y:0.2}
   var d = 0;
 
@@ -28,6 +29,7 @@ export const App = () => {
 
   const calcSun = () => {
     d = new Date();
+    //d.setHours(16)
     const observer = new Astronomy.Observer(latitude, longitude, 0);
     let equ_ofdate = Astronomy.Equator('Sun', d, observer, true, true);
     let hor = Astronomy.Horizon(d, observer, equ_ofdate.ra, equ_ofdate.dec, 'normal');
@@ -36,7 +38,8 @@ export const App = () => {
 
   const calcShadow = () => {
     shadow_offset = (building_height / Math.tan(toRadians(calcSun().altitude))) / 12.0;
-    if (calcSun().azimuth > 210.67) {
+    console.log(toDegrees(calcSun().altitude))
+    if (calcSun().azimuth > 208.56) {
       shadow_width = Math.abs(shadow_offset * Math.sin(toRadians(calcSun().azimuth - building_sun_angle))) * scale.x;
       shadow_length = Math.abs(shadow_offset * Math.cos(toRadians(calcSun().azimuth - building_sun_angle))) * scale.x;
     }
@@ -51,7 +54,7 @@ export const App = () => {
   console.log(shadow_length)
   console.log(d);
 
-  const drawShadow = () => {
+  const drawShadow = async () => {
     calcShadow()
     var pointOne = { x: 0, y: 0 }
     pointOne.x = 960-shadow_width/2;
@@ -59,8 +62,8 @@ export const App = () => {
 
     const canvas = canvasRef.current
     const context = canvas.getContext('2d');
-    context.reset()
-    context.fillStyle = "rgba(0,0,0,0.5)";
+    //context.reset()
+    context.fillStyle = "rgba(0,0,0,0.75)";
     context.beginPath();
     context.moveTo(pointOne.x, pointOne.y);
     context.lineTo(pointOne.x + shadow_width, pointOne.y - shadow_length);
@@ -68,16 +71,6 @@ export const App = () => {
     context.lineTo(pointOne.x, pointOne.y - (building_length*scale.y) + shadow_length);
     context.lineTo(pointOne.x, pointOne.y);
     context.closePath();
-    //context.stroke();
-    context.fill();
-    context.beginPath();
-    context.moveTo(pointOne.x, pointOne.y);
-    context.lineTo(pointOne.x + shadow_width+5, pointOne.y - shadow_length-5);
-    context.lineTo(pointOne.x + shadow_width+5, pointOne.y - (building_length*scale.y)-10);
-    context.lineTo(pointOne.x, pointOne.y - (building_length*scale.y) + shadow_length);
-    context.lineTo(pointOne.x, pointOne.y);
-    context.closePath();
-    //context.stroke();
     context.fill();
   }
 
